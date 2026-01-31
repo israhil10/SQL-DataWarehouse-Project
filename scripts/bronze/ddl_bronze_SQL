@@ -9,8 +9,6 @@ Script Purpose:
 =====================================================================
 */
 
-
-
 IF OBJECT_ID ('bronze.crm_cust_info','U') IS NOT NULL 
 	DROP TABLE bronze.crm_cust_info;
 
@@ -74,4 +72,3 @@ CREATE TABLE bronze.erp_px_cat_g1v2(
 	subcat NVARCHAR(50),
 	maintenance NVARCHAR(50)
 );
-
