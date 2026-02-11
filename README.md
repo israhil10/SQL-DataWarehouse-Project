@@ -29,66 +29,15 @@ This project demonstrates practical **data engineering, ETL development, and dim
 
 # Architecture Overview
 
-## Data Architecture Landscape
+## Project Flow Diagram
 
-![Data Architecture Overview](images/data_architecture_overview.png)
-
-The project follows the **Medallion Architecture**, which is a modern layered approach inside broader data architectures like:
-
-- Inmon (3NF EDW)
-- Kimball (Data Marts)
-- Data Vault
-- Lakehouse
-- Data Mesh
-
-The Medallion approach simplifies this into:
-
-```
-Bronze → Silver → Gold
-```
+![Project Overview](docs/project_overview.png)
 
 ---
 
-## Data Warehouse Flow (This Project)
+## Data Architecture Landscape
 
-![Medallion Flow](images/medallion_flow.png)
-
-### Flow Explanation:
-
-**Sources**
-- CRM (CSV files)
-- ERP (CSV files)
-
-⬇
-
-**Bronze Layer**
-- Raw Data
-- No transformations
-- Tables only
-- Full Load (Truncate & Insert)
-
-⬇
-
-**Silver Layer**
-- Cleaned & standardized data
-- Deduplication
-- Business logic enforcement
-- Tables only
-
-⬇
-
-**Gold Layer**
-- Business-ready views
-- Star Schema
-- Aggregations
-- Reporting-ready datasets
-
-⬇
-
-**Consumption**
-- BI & Reporting
-- Ad-hoc SQL Queries
-- Machine Learning
+![Data Architecture](docs/data_architecture.png)
 
 ---
 
@@ -293,20 +242,27 @@ Key fields:
 # Project Structure
 
 ```text
+SQL-DataWarehouse-Project/
+│
 ├── datasets/
 │   ├── source_crm/
 │   └── source_erp/
+│
 ├── bronze/
 │   ├── bronze_ddl.sql
 │   └── load_bronze.sql
+│
 ├── silver/
 │   ├── silver_ddl.sql
 │   └── load_silver.sql
+│
 ├── gold/
 │   └── gold_views.sql
-├── images/
-│   ├── data_architecture_overview.png
-│   └── medallion_flow.png
+│
+├── docs/
+│   ├── project_overview.png
+│   └── data_architecture.png
+│
 └── README.md
 ```
 
