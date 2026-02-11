@@ -1,6 +1,7 @@
 # SQL Data Warehouse Project (Medallion Architecture)
 
 ## Quick Links
+- 🏗️ [Architecture Overview](#architecture-overview)
 - 🥉 [Bronze Layer](#bronze-layer--raw-data-ingestion)
 - 🥈 [Silver Layer](#silver-layer--data-cleansing--transformation)
 - 🥇 [Gold Layer](#gold-layer--star-schema-analytics-ready)
@@ -10,27 +11,9 @@
 
 ---
 
-## Table of Contents
-- [Project Overview](#project-overview)
-- [Business Problem](#business-problem)
-- [Objectives](#objectives)
-- [Architecture Design](#architecture-design)
-- [Bronze Layer – Raw Data Ingestion](#bronze-layer--raw-data-ingestion)
-- [Silver Layer – Data Cleansing & Transformation](#silver-layer--data-cleansing--transformation)
-- [Gold Layer – Star Schema (Analytics Ready)](#gold-layer--star-schema-analytics-ready)
-- [Star Schema Design](#star-schema-design)
-- [ETL Process Flow](#etl-process-flow)
-- [Technical Highlights](#technical-highlights)
-- [Challenges Faced](#challenges-faced)
-- [Key Learnings](#key-learnings)
-- [Project Structure](#project-structure)
-- [Contact](#contact)
-
----
-
 ## Project Overview
 
-This project implements a complete SQL-based Data Warehouse solution using a layered **Medallion Architecture (Bronze → Silver → Gold)**.
+This project implements a complete SQL-based **Data Warehouse solution** using the **Medallion Architecture (Bronze → Silver → Gold)**.
 
 The system:
 
@@ -40,25 +23,90 @@ The system:
 - Implements a dimensional Star Schema  
 - Produces analytics-ready fact and dimension views  
 
-This project demonstrates practical data engineering, ETL development, and dimensional modeling skills using SQL Server.
+This project demonstrates practical **data engineering, ETL development, and dimensional modeling** using SQL Server.
 
 ---
 
-## Business Problem
+# Architecture Overview
 
-Organizations often face challenges such as:
+## Data Architecture Landscape
+
+![Data Architecture Overview](images/data_architecture_overview.png)
+
+The project follows the **Medallion Architecture**, which is a modern layered approach inside broader data architectures like:
+
+- Inmon (3NF EDW)
+- Kimball (Data Marts)
+- Data Vault
+- Lakehouse
+- Data Mesh
+
+The Medallion approach simplifies this into:
+
+```
+Bronze → Silver → Gold
+```
+
+---
+
+## Data Warehouse Flow (This Project)
+
+![Medallion Flow](images/medallion_flow.png)
+
+### Flow Explanation:
+
+**Sources**
+- CRM (CSV files)
+- ERP (CSV files)
+
+⬇
+
+**Bronze Layer**
+- Raw Data
+- No transformations
+- Tables only
+- Full Load (Truncate & Insert)
+
+⬇
+
+**Silver Layer**
+- Cleaned & standardized data
+- Deduplication
+- Business logic enforcement
+- Tables only
+
+⬇
+
+**Gold Layer**
+- Business-ready views
+- Star Schema
+- Aggregations
+- Reporting-ready datasets
+
+⬇
+
+**Consumption**
+- BI & Reporting
+- Ad-hoc SQL Queries
+- Machine Learning
+
+---
+
+# Business Problem
+
+Organizations often face:
 
 - Disconnected CRM and ERP systems  
 - Duplicate customer records  
-- Inconsistent product structures  
+- Inconsistent product hierarchies  
 - Dirty and incomplete data  
 - Limited reporting performance  
 
-This project centralizes data into a structured warehouse and applies business logic to enable reliable analytics.
+This project centralizes data into a structured warehouse and applies business rules to enable reliable analytics.
 
 ---
 
-## Objectives
+# Objectives
 
 - Design a layered Data Warehouse architecture  
 - Ingest raw CSV data using BULK INSERT  
@@ -66,25 +114,7 @@ This project centralizes data into a structured warehouse and applies business l
 - Normalize inconsistent source values  
 - Implement dimensional modeling  
 - Build a Star Schema for analytics  
-- Ensure maintainable and scalable ETL pipelines  
-
----
-
-## Architecture Design
-
-The project follows the Medallion Architecture pattern:
-
-```
-Source CSV Files
-        ↓
-Bronze (Raw Layer)
-        ↓
-Silver (Clean & Transformed Layer)
-        ↓
-Gold (Business-Ready Star Schema)
-```
-
-Each layer has a clearly defined responsibility.
+- Ensure scalable and maintainable ETL pipelines  
 
 ---
 
@@ -104,12 +134,12 @@ Stores raw, unmodified data exactly as received from source systems.
 
 ## Bronze Tables
 
-- bronze.crm_cust_info  
-- bronze.crm_prd_info  
-- bronze.crm_sales_details  
-- bronze.erp_cust_az12  
-- bronze.erp_loc_a101  
-- bronze.erp_px_cat_g1v2  
+- `bronze.crm_cust_info`  
+- `bronze.crm_prd_info`  
+- `bronze.crm_sales_details`  
+- `bronze.erp_cust_az12`  
+- `bronze.erp_loc_a101`  
+- `bronze.erp_px_cat_g1v2`  
 
 ## Execution
 
@@ -137,19 +167,19 @@ Performs ETL logic:
 - Trim whitespace  
 - Normalize marital status  
 - Normalize gender  
-- Remove duplicates using ROW_NUMBER()  
+- Remove duplicates using `ROW_NUMBER()`  
 
 ### Product Data
 - Extract category ID  
 - Normalize product line codes  
 - Convert DATETIME to DATE  
-- Calculate product end date using LEAD()  
+- Calculate product end date using `LEAD()`  
 
 ### Sales Data
 - Convert integer date (YYYYMMDD) to DATE  
 - Recalculate sales if incorrect  
 - Derive price if missing  
-- Prevent divide-by-zero using NULLIF()  
+- Prevent divide-by-zero using `NULLIF()`  
 
 ### ERP Data
 - Remove ID prefixes  
@@ -171,13 +201,13 @@ EXEC silver.load_silver;
 
 Provides structured dimensional models optimized for analytics and BI tools.
 
-Gold objects are created as views for flexibility and maintainability.
+Gold objects are created as **views** for flexibility and maintainability.
 
 ---
 
 # Star Schema Design
 
-## Fact Table – gold.fact_sales
+## Fact Table – `gold.fact_sales`
 
 Contains transactional sales data.
 
@@ -193,7 +223,9 @@ Key fields:
 - Quantity  
 - Price  
 
-## Dimension – gold.dim_customers
+---
+
+## Dimension – `gold.dim_customers`
 
 - Surrogate Customer Key  
 - Customer ID  
@@ -204,7 +236,9 @@ Key fields:
 - Birthdate  
 - Create Date  
 
-## Dimension – gold.dim_products
+---
+
+## Dimension – `gold.dim_products`
 
 - Surrogate Product Key  
 - Product ID  
@@ -227,7 +261,7 @@ Key fields:
 # Technical Highlights
 
 - Medallion Architecture implementation  
-- Window functions (ROW_NUMBER, LEAD)  
+- Window functions (`ROW_NUMBER`, `LEAD`)  
 - Surrogate key generation  
 - Data validation logic  
 - Business rule enforcement  
@@ -270,8 +304,9 @@ Key fields:
 │   └── load_silver.sql
 ├── gold/
 │   └── gold_views.sql
-├── documentation/
-│   └── architecture_notes.md
+├── images/
+│   ├── data_architecture_overview.png
+│   └── medallion_flow.png
 └── README.md
 ```
 
@@ -284,3 +319,5 @@ Key fields:
 **LinkedIn:** https://www.linkedin.com/in/mohd-israhil-shaikh-3b8b04281/  
 **Portfolio:** https://shaikh-israhil-eqci8dy.gamma.site/  
 **GitHub:** https://github.com/israhil10  
+
+---
